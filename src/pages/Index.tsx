@@ -94,6 +94,10 @@ export default function Index() {
     );
   };
 
+  const handleClearCart = () => {
+    setCartItems([]);
+  };
+
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -111,6 +115,7 @@ export default function Index() {
         items={cartItems}
         onRemoveItem={handleRemoveItem}
         onUpdateQuantity={handleUpdateQuantity}
+        onClearCart={handleClearCart}
       />
     </div>
   );

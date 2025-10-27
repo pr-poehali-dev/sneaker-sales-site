@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import { Product } from './ProductCard';
+import OrderForm from './OrderForm';
 
 export interface CartItem extends Product {
   quantity: number;
@@ -14,10 +16,18 @@ interface CartProps {
   items: CartItem[];
   onRemoveItem: (id: number) => void;
   onUpdateQuantity: (id: number, quantity: number) => void;
+  onClearCart: () => void;
 }
 
-export default function Cart({ isOpen, onClose, items, onRemoveItem, onUpdateQuantity }: CartProps) {
+export default function Cart({ isOpen, onClose, items, onRemoveItem, onUpdateQuantity, onClearCart }: CartProps) {
+  const [showOrderForm, setShowOrderForm] = useState(false);
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleOrderSuccess = () => {
+    setShowOrderForm(false);
+    onClearCart();
+    onClose();
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -33,6 +43,13 @@ export default function Cart({ isOpen, onClose, items, onRemoveItem, onUpdateQua
                 <Icon name="ShoppingCart" size={64} className="text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">Корзина пуста</p>
               </div>
+            ) : showOrderForm ? (
+              <OrderForm
+                items={items}
+                totalAmount={total}
+                onSuccess={handleOrderSuccess}
+                onCancel={() => setShowOrderForm(false)}
+              />
             ) : (
               <div className="space-y-4">
                 {items.map((item) => (
@@ -79,14 +96,14 @@ export default function Cart({ isOpen, onClose, items, onRemoveItem, onUpdateQua
             )}
           </div>
 
-          {items.length > 0 && (
+          {items.length > 0 && !showOrderForm && (
             <SheetFooter className="border-t pt-6">
               <div className="w-full space-y-4">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Итого:</span>
                   <span>{total.toLocaleString('ru-RU')} ₽</span>
                 </div>
-                <Button className="w-full" size="lg">
+                <Button className="w-full" size="lg" onClick={() => setShowOrderForm(true)}>
                   Оформить заказ
                 </Button>
               </div>
