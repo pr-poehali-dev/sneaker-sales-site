@@ -51,7 +51,20 @@ export default function OrderForm({ items, totalAmount, onSuccess, onCancel }: O
         status: 'новый'
       };
 
-      console.log('Заказ создан:', orderData);
+      const response = await fetch('https://functions.poehali.dev/70394b2a-2435-4fdf-8854-f28f756da53d', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка при сохранении заказа');
+      }
+
+      const result = await response.json();
+      console.log('Заказ сохранен:', result);
 
       toast({
         title: 'Заказ оформлен!',
